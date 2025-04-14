@@ -83,10 +83,104 @@ describe('Dblog', () => {
         console.log(getCurrentNumberOfPosts);
     });
 
+    it('should NOT withdraw TON from the contract', async () => {
 
+        wallet1 = await blockchain.treasury('wallet1')
+        
+        const sendResult = await dblog.send(
+            wallet1.getSender(),
+            {
+                value: toNano(10),
+            },
+            {
+                $$type: 'AddPost',
+                textOfPost: {
+                    $$type: 'Post',
+                    text: "This message with 10 TONs",
+                }
+            }
+        )
 
+        expect(sendResult.transactions).toHaveTransaction({
+            from: wallet1.address,
+            success: true
+        })
 
+        const balanceSMCbefore = await dblog.getBalance()
 
+        const withdrawNotOwnerResult = await dblog.send(
+            wallet1.getSender(),
+            {
+                value: toNano(0.05),
+            },
+            {
+                $$type: 'WithDraw',
+                amountToWithdraw: toNano(3)
+            }
+        )
+
+        const balanceSMCafter = await dblog.getBalance()
+        expect(Number(balanceSMCbefore)).toBeCloseTo(Number(balanceSMCafter))
+
+        console.log(balanceSMCbefore)
+        console.log(balanceSMCafter)
+
+        expect(withdrawNotOwnerResult.transactions).toHaveTransaction({
+            from: wallet1.address,
+            success: false,
+            exitCode: 132,
+        })
+    });
+
+    it('should withdraw TON from the contract', async () => {
+
+        const SMCowner = await dblog.getOwner();
+
+        expect(String(SMCowner)).toBe(String(deployer.address))
+        console.log(String(SMCowner))
+        console.log(String(deployer.address))
+
+        wallet1 = await blockchain.treasury('wallet1')
+        
+        const sendResult = await dblog.send(
+            wallet1.getSender(),
+            {
+                value: toNano(10),
+            },
+            {
+                $$type: 'AddPost',
+                textOfPost: {
+                    $$type: 'Post',
+                    text: "This message with 10 TONs",
+                }
+            }
+        )
+
+        expect(sendResult.transactions).toHaveTransaction({
+            from: wallet1.address,
+            success: true
+        })
+
+        const balanceSMCbefore = await dblog.getBalance()
+
+        const withdrawOwnerResult = await dblog.send(
+            deployer.getSender(),
+            {
+                value: toNano(0.05),
+            },
+            {
+                $$type: 'WithDraw',
+                amountToWithdraw: toNano(3)
+            }
+        )
+
+        const balanceSMCafter = await dblog.getBalance()
+        expect(Number(balanceSMCbefore)).toBeGreaterThan(Number(balanceSMCafter))
+
+        console.log(balanceSMCbefore)
+        console.log(balanceSMCafter)
+
+    });
 
 
 
