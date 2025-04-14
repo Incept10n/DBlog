@@ -16,7 +16,7 @@ struct Post {
 contract Dblog with Deployable, Ownable {
 
     owner: Address;
-    blogs: map<Address, Post>;
+    blogs: map<Int, Post>;
     maxNumberOfPosts: Int as uint8;
     currentNumberOfPosts: Int as uint8;
 
@@ -30,7 +30,8 @@ contract Dblog with Deployable, Ownable {
 
     receive(msg: AddPost) {
         throwUnless(700, self.currentNumberOfPosts <= self.maxNumberOfPosts);
-        self.blogs.set(sender(), msg.textOfPost);
+
+        self.blogs.set(self.currentNumberOfPosts, msg.textOfPost);
         self.currentNumberOfPosts += 1;
     }
 
@@ -45,7 +46,7 @@ contract Dblog with Deployable, Ownable {
     }
 
 
-    get fun AllPosts(): map<Address, Post> {
+    get fun AllPosts(): map<Int, Post> {
         return self.blogs;
     }
 
