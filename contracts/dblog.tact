@@ -31,6 +31,9 @@ contract Dblog with Deployable, Ownable {
     receive(msg: AddPost) {
         throwUnless(700, self.currentNumberOfPosts <= self.maxNumberOfPosts);
 
+        let ctx: Context = context();
+        throwUnless(701, ctx.value >= 2000000000);
+
         self.blogs.set(self.currentNumberOfPosts, msg.textOfPost);
         self.currentNumberOfPosts += 1;
     }

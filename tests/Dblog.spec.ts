@@ -45,27 +45,14 @@ describe('Dblog', () => {
         const sendResult = await dblog.send(
             wallet1.getSender(),
             {
-                value: toNano(0.05)
+                // value: toNano(0.05)
+                value: toNano(2)
             },
             {
                 $$type: "AddPost",
                 textOfPost: {
                     $$type: 'Post', 
                     text: "How to make cookies"
-                }
-            }
-        )
-
-        const sendAnotherResult = await dblog.send(
-            wallet2.getSender(),
-            {
-                value: toNano(0.05)
-            },
-            {
-                $$type: "AddPost",
-                textOfPost: {
-                    $$type: 'Post', 
-                    text: "heheheheh"
                 }
             }
         )
